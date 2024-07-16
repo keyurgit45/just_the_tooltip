@@ -254,4 +254,19 @@ abstract class JustTheInterface extends StatefulWidget {
   /// example, if the tooltip happens to go beyond its quadrant but there is
   /// scroll space beneath it the bounds will accomadate it.
   ScrollController? get scrollController;
+
+  /// below are the properties for the overlay widget
+  /// whether to show the overlay widget or not
+  /// if true, the overlay widget will be shown, otherwise it will not be shown
+  /// the overlay widget will be shown on top of the tooltip widget
+
+  bool get showWidgetOverlay;
+
+  double get overlayHeight;
+
+  double get overlayWidth;
+
+  Offset get overlayOffset;
+
+  Widget? get overlayWidget;
 }

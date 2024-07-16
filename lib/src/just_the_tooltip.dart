@@ -20,45 +20,50 @@ typedef HideTooltip = Future<void> Function({bool immediately});
 
 /// {@macro just_the_tooltip.overlay.constructor}
 class JustTheTooltip extends StatefulWidget implements JustTheInterface {
-  const JustTheTooltip({
-    Key? key,
-    required this.content,
-    required this.child,
-    this.onDismiss,
-    this.onShow,
-    this.controller,
-    // TODO: With the new [triggerMode] field isModal's only function is to keep
-    // the tooltip open. But in that case, it seems like we can create a new
-    // more narrow field in favor.
-    this.isModal = false,
-    this.waitDuration,
-    this.showDuration,
-    this.triggerMode,
-    this.barrierDismissible = true,
-    this.barrierColor = Colors.transparent,
-    this.barrierBuilder,
-    this.enableFeedback,
-    this.hoverShowDuration,
-    this.fadeInDuration = const Duration(milliseconds: 150),
-    this.fadeOutDuration = const Duration(milliseconds: 75),
-    this.preferredDirection = AxisDirection.down,
-    this.curve = Curves.easeInOut,
-    this.reverseCurve = Curves.easeInOut,
-    this.margin = const EdgeInsets.all(8.0),
-    this.offset = 0.0,
-    this.elevation = 4.0,
-    this.borderRadius = const BorderRadius.all(Radius.circular(6)),
-    this.tailLength = 16.0,
-    this.tailBaseWidth = 32.0,
-    this.tailBuilder = JustTheInterface.defaultTailBuilder,
-    this.animatedTransitionBuilder =
-        JustTheInterface.defaultAnimatedTransitionBuilder,
-    this.backgroundColor,
-    this.textDirection = TextDirection.ltr,
-    this.shadow,
-    this.showWhenUnlinked = false,
-    this.scrollController,
-  }) : super(key: key);
+  const JustTheTooltip(
+      {Key? key,
+      required this.content,
+      required this.child,
+      this.onDismiss,
+      this.onShow,
+      this.controller,
+      // TODO: With the new [triggerMode] field isModal's only function is to keep
+      // the tooltip open. But in that case, it seems like we can create a new
+      // more narrow field in favor.
+      this.isModal = false,
+      this.waitDuration,
+      this.showDuration,
+      this.triggerMode,
+      this.barrierDismissible = true,
+      this.barrierColor = Colors.transparent,
+      this.barrierBuilder,
+      this.enableFeedback,
+      this.hoverShowDuration,
+      this.fadeInDuration = const Duration(milliseconds: 150),
+      this.fadeOutDuration = const Duration(milliseconds: 75),
+      this.preferredDirection = AxisDirection.down,
+      this.curve = Curves.easeInOut,
+      this.reverseCurve = Curves.easeInOut,
+      this.margin = const EdgeInsets.all(8.0),
+      this.offset = 0.0,
+      this.elevation = 4.0,
+      this.borderRadius = const BorderRadius.all(Radius.circular(6)),
+      this.tailLength = 16.0,
+      this.tailBaseWidth = 32.0,
+      this.tailBuilder = JustTheInterface.defaultTailBuilder,
+      this.animatedTransitionBuilder =
+          JustTheInterface.defaultAnimatedTransitionBuilder,
+      this.backgroundColor,
+      this.textDirection = TextDirection.ltr,
+      this.shadow,
+      this.showWhenUnlinked = false,
+      this.scrollController,
+      this.showWidgetOverlay = false,
+      this.overlayHeight = 0.0,
+      this.overlayWidth = 0.0,
+      this.overlayOffset = Offset.zero,
+      this.overlayWidget})
+      : super(key: key);
 
   @override
   final JustTheController? controller;
@@ -159,6 +164,21 @@ class JustTheTooltip extends StatefulWidget implements JustTheInterface {
   final ScrollController? scrollController;
 
   @override
+  final bool showWidgetOverlay;
+
+  @override
+  final double overlayHeight;
+
+  @override
+  final double overlayWidth;
+
+  @override
+  final Offset overlayOffset;
+
+  @override
+  final Widget? overlayWidget;
+
+  @override
   JustTheTooltipState<OverlayEntry> createState() =>
       _JustTheTooltipOverlayState();
 }
@@ -166,6 +186,8 @@ class JustTheTooltip extends StatefulWidget implements JustTheInterface {
 class _JustTheTooltipOverlayState extends JustTheTooltipState<OverlayEntry> {
   @override
   OverlayEntry? entry;
+
+  OverlayEntry? widgetEntry;
 
   @override
   OverlayEntry? skrim;
@@ -226,6 +248,12 @@ class _JustTheTooltipOverlayState extends JustTheTooltipState<OverlayEntry> {
 
           overlay.insert(entryOverlay);
         }
+
+        if (widget.showWidgetOverlay && widget.overlayWidget != null) {
+          widgetEntry = _createOverlayEntry();
+
+          overlay.insert(widgetEntry!);
+        }
       },
     );
   }
@@ -236,12 +264,14 @@ class _JustTheTooltipOverlayState extends JustTheTooltipState<OverlayEntry> {
     cancelShowTimer();
 
     entry?.remove();
+    widgetEntry?.remove();
 
     if (widget.isModal) {
       skrim?.remove();
     }
 
     entry = null;
+    widgetEntry = null;
 
     if (widget.isModal) {
       skrim = null;
@@ -759,6 +789,27 @@ abstract class JustTheTooltipState<T> extends State<JustTheInterface>
             },
           ),
         ),
+      ),
+    );
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    final targetInformation = _getTargetInformation(context);
+
+    final box = context.findRenderObject() as RenderBox?;
+
+    if (box == null) {
+      throw StateError(
+        'Cannot find the box for the given object with context $context',
+      );
+    }
+
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        height: widget.overlayHeight,
+        width: widget.overlayWidth,
+        child: CompositedTransformFollower(
+            link: _layerLink, offset: widget.overlayOffset, child: widget.overlayWidget),
       ),
     );
   }

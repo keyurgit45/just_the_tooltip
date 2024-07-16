@@ -6,42 +6,46 @@ part of './just_the_tooltip.dart';
 ///
 /// {@macro just_the_tooltip.overlay.constructor}
 class JustTheTooltipEntry extends StatefulWidget implements JustTheInterface {
-  const JustTheTooltipEntry({
-    super.key,
-    required this.content,
-    required this.child,
-    this.onDismiss,
-    this.onShow,
-    this.controller,
-    this.isModal = false,
-    this.waitDuration,
-    this.showDuration,
-    this.triggerMode,
-    this.barrierDismissible = true,
-    this.barrierColor = Colors.transparent,
-    this.barrierBuilder,
-    this.enableFeedback,
-    this.hoverShowDuration,
-    this.fadeInDuration = const Duration(milliseconds: 150),
-    this.fadeOutDuration = const Duration(milliseconds: 75),
-    this.preferredDirection = AxisDirection.down,
-    this.curve = Curves.easeInOut,
-    this.reverseCurve = Curves.easeInOut,
-    this.margin = const EdgeInsets.all(8.0),
-    this.offset = 0.0,
-    this.elevation = 4.0,
-    this.borderRadius = const BorderRadius.all(Radius.circular(6)),
-    this.tailLength = 16.0,
-    this.tailBaseWidth = 32.0,
-    this.tailBuilder = JustTheInterface.defaultTailBuilder,
-    this.animatedTransitionBuilder =
-        JustTheInterface.defaultAnimatedTransitionBuilder,
-    this.backgroundColor,
-    this.textDirection = TextDirection.ltr,
-    this.shadow,
-    this.showWhenUnlinked = false,
-    this.scrollController,
-  });
+  const JustTheTooltipEntry(
+      {super.key,
+      required this.content,
+      required this.child,
+      this.onDismiss,
+      this.onShow,
+      this.controller,
+      this.isModal = false,
+      this.waitDuration,
+      this.showDuration,
+      this.triggerMode,
+      this.barrierDismissible = true,
+      this.barrierColor = Colors.transparent,
+      this.barrierBuilder,
+      this.enableFeedback,
+      this.hoverShowDuration,
+      this.fadeInDuration = const Duration(milliseconds: 150),
+      this.fadeOutDuration = const Duration(milliseconds: 75),
+      this.preferredDirection = AxisDirection.down,
+      this.curve = Curves.easeInOut,
+      this.reverseCurve = Curves.easeInOut,
+      this.margin = const EdgeInsets.all(8.0),
+      this.offset = 0.0,
+      this.elevation = 4.0,
+      this.borderRadius = const BorderRadius.all(Radius.circular(6)),
+      this.tailLength = 16.0,
+      this.tailBaseWidth = 32.0,
+      this.tailBuilder = JustTheInterface.defaultTailBuilder,
+      this.animatedTransitionBuilder =
+          JustTheInterface.defaultAnimatedTransitionBuilder,
+      this.backgroundColor,
+      this.textDirection = TextDirection.ltr,
+      this.shadow,
+      this.showWhenUnlinked = false,
+      this.scrollController,
+      this.showWidgetOverlay = false,
+      this.overlayHeight = 0.0,
+      this.overlayWidth = 0.0,
+      this.overlayOffset = Offset.zero,
+      this.overlayWidget});
 
   @override
   final JustTheController? controller;
@@ -139,6 +143,21 @@ class JustTheTooltipEntry extends StatefulWidget implements JustTheInterface {
 
   @override
   final ScrollController? scrollController;
+
+  @override
+  final bool showWidgetOverlay;
+
+  @override
+  final double overlayHeight;
+
+  @override
+  final double overlayWidth;
+
+  @override
+  final Offset overlayOffset;
+
+  @override
+  final Widget? overlayWidget;
 
   @override
   JustTheTooltipState<Widget> createState() => _JustTheTooltipEntryState();
