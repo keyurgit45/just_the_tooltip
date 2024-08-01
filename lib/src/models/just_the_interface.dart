@@ -40,6 +40,18 @@ abstract class JustTheInterface extends StatefulWidget {
       ..close();
   }
 
+  /// Draws a linear open base triangle path for the tail.
+  static Path defaultTailBuilderWithoutBase(
+    Offset tip,
+    Offset point2,
+    Offset point3,
+  ) {
+    return Path()
+      ..moveTo(point2.dx, point2.dy)
+      ..lineTo(tip.dx, tip.dy)
+      ..lineTo(point3.dx, point3.dy);
+  }
+
   /// Draws a bezier closed triangle path for the tail.
   static Path defaultBezierTailBuilder(
     Offset tip,
@@ -216,6 +228,14 @@ abstract class JustTheInterface extends StatefulWidget {
 
   /// The border radius of the tooltip
   BorderRadiusGeometry get borderRadius;
+
+  /// The border color of the tooltip
+  Color? get borderColor;
+
+  /// The border thickness of the tooltip
+  ///
+  /// Ignored if [borderColor] is null
+  double get borderWidth;
 
   /// The length of the tail or the amount of space from the tooltip
   /// target + [offset] to the nearest edge of the tooltip.

@@ -31,6 +31,8 @@ class JustTheTooltipEntry extends StatefulWidget implements JustTheInterface {
       this.offset = 0.0,
       this.elevation = 4.0,
       this.borderRadius = const BorderRadius.all(Radius.circular(6)),
+      this.borderColor,
+      this.borderWidth = 1,
       this.tailLength = 16.0,
       this.tailBaseWidth = 32.0,
       this.tailBuilder = JustTheInterface.defaultTailBuilder,
@@ -116,6 +118,12 @@ class JustTheTooltipEntry extends StatefulWidget implements JustTheInterface {
 
   @override
   final BorderRadiusGeometry borderRadius;
+
+  @override
+  final Color? borderColor;
+
+  @override
+  final double borderWidth;
 
   @override
   final double tailLength;

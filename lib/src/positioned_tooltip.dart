@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:just_the_tooltip/src/utils/get_axis_direction.dart';
 import 'package:just_the_tooltip/src/utils/get_position_dependent_offset.dart';
 
@@ -32,6 +33,8 @@ class PositionedTooltip extends SingleChildRenderObjectWidget {
     required this.shadow,
     required this.elevation,
     required this.scrollPosition,
+    required this.borderColor,
+    required this.borderWidth,
   }) : super(key: key, child: child);
 
   final EdgeInsetsGeometry margin;
@@ -66,6 +69,10 @@ class PositionedTooltip extends SingleChildRenderObjectWidget {
 
   final ScrollPosition? scrollPosition;
 
+  final Color? borderColor;
+
+  final double borderWidth;
+
   @override
   RenderObject createRenderObject(BuildContext context) {
     return RenderPositionedTooltip(
@@ -83,6 +90,8 @@ class PositionedTooltip extends SingleChildRenderObjectWidget {
       shadow: shadow,
       elevation: elevation,
       scrollPosition: scrollPosition,
+      borderColor: borderColor,
+      borderWidth: borderWidth,
     );
   }
 
@@ -105,7 +114,9 @@ class PositionedTooltip extends SingleChildRenderObjectWidget {
       ..targetSize = targetSize
       ..shadow = shadow
       ..elevation = elevation
-      ..scrollPosition = scrollPosition;
+      ..scrollPosition = scrollPosition
+      ..borderColor = borderColor
+      ..borderWidth = borderWidth;
   }
 
   @override
@@ -166,6 +177,8 @@ class RenderPositionedTooltip extends RenderShiftedBox
     required Shadow shadow,
     required double elevation,
     required ScrollPosition? scrollPosition,
+    required Color? borderColor,
+    required double borderWidth,
   })  : _margin = margin,
         _offset = offset,
         _target = target,
@@ -180,6 +193,8 @@ class RenderPositionedTooltip extends RenderShiftedBox
         _shadow = shadow,
         _elevation = elevation,
         _scrollPosition = scrollPosition,
+        _borderColor = borderColor,
+        _borderWidth = borderWidth,
         super(child);
 
   late AxisDirection axisDirection;
@@ -293,6 +308,22 @@ class RenderPositionedTooltip extends RenderShiftedBox
   set scrollPosition(ScrollPosition? value) {
     if (_scrollPosition == value) return;
     _scrollPosition = value;
+    markNeedsLayout();
+  }
+
+  Color? get borderColor => _borderColor;
+  Color? _borderColor;
+  set borderColor(Color? value) {
+    if (value == _borderColor) return;
+    _borderColor = value;
+    markNeedsPaint();
+  }
+
+  double get borderWidth => _borderWidth;
+  double _borderWidth;
+  set borderWidth(double value) {
+    if (_borderWidth == value) return;
+    _borderWidth = value;
     markNeedsLayout();
   }
 
@@ -445,6 +476,55 @@ class RenderPositionedTooltip extends RenderShiftedBox
           false,
         );
         context.canvas.drawPath(path, paint);
+
+        if (borderColor != null) {
+          Paint borderPaint = Paint()
+            ..color = borderColor!
+            ..strokeWidth = borderWidth
+            ..style = PaintingStyle.stroke;
+
+          Path rectBorderPath = Path()
+            ..addRRect(
+              RRect.fromRectAndCorners(
+                rect,
+                topLeft: radius.topLeft,
+                topRight: radius.topRight,
+                bottomLeft: radius.bottomLeft,
+                bottomRight: radius.bottomRight,
+              ),
+            );
+
+          context.canvas.drawPath(
+            rectBorderPath,
+            borderPaint,
+          );
+
+          // painting tail base same as bg color
+          context.canvas.drawPath(
+            _paintTailBase(
+              rect: rect,
+              radius: radius,
+            ),
+            Paint()
+              ..strokeWidth = borderWidth + 0.2
+              ..color = backgroundColor.withOpacity(1)
+              ..style = PaintingStyle.stroke,
+          );
+
+          // drawing tail without base on top of bg colored tail base to prevent
+          // distortion of the border
+          context.canvas.drawPath(
+            Path()
+              ..addPath(
+                _paintTailWithoutBase(
+                  rect: rect,
+                  radius: radius,
+                ),
+                Offset.zero,
+              ),
+            borderPaint,
+          );
+        }
       }
     }
 
@@ -531,6 +611,47 @@ class RenderPositionedTooltip extends RenderShiftedBox
   }
 
   Path _paintTail({
+    required Rect rect,
+    required BorderRadius radius,
+  }) {
+    var points = _getTailPoints(
+      rect: rect,
+      radius: radius,
+    );
+    return tailBuilder(points[0], points[1], points[2]);
+  }
+
+  Path _paintTailWithoutBase({
+    required Rect rect,
+    required BorderRadius radius,
+  }) {
+    var points = _getTailPoints(
+      rect: rect,
+      radius: radius,
+    );
+
+    return JustTheInterface.defaultTailBuilderWithoutBase(
+      points[0],
+      points[1],
+      points[2],
+    );
+  }
+
+  Path _paintTailBase({
+    required Rect rect,
+    required BorderRadius radius,
+  }) {
+    var points = _getTailPoints(
+      rect: rect,
+      radius: radius,
+    );
+
+    return Path()
+      ..moveTo(points[1].dx, points[1].dy)
+      ..lineTo(points[2].dx, points[2].dy);
+  }
+
+  List<Offset> _getTailPoints({
     required Rect rect,
     required BorderRadius radius,
   }) {
@@ -655,7 +776,11 @@ class RenderPositionedTooltip extends RenderShiftedBox
         break;
     }
 
-    return tailBuilder(Offset(x, y), Offset(x2, y2), Offset(x3, y3));
+    return [
+      Offset(x, y),
+      Offset(x2, y2),
+      Offset(x3, y3),
+    ];
   }
 
   @override

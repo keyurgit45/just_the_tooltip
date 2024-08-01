@@ -48,6 +48,8 @@ class JustTheTooltip extends StatefulWidget implements JustTheInterface {
       this.offset = 0.0,
       this.elevation = 4.0,
       this.borderRadius = const BorderRadius.all(Radius.circular(6)),
+      this.borderColor,
+      this.borderWidth = 1.0,
       this.tailLength = 16.0,
       this.tailBaseWidth = 32.0,
       this.tailBuilder = JustTheInterface.defaultTailBuilder,
@@ -135,6 +137,12 @@ class JustTheTooltip extends StatefulWidget implements JustTheInterface {
 
   @override
   final BorderRadiusGeometry borderRadius;
+
+  @override
+  final Color? borderColor;
+
+  @override
+  final double borderWidth;
 
   @override
   final double tailLength;
@@ -759,6 +767,8 @@ abstract class JustTheTooltipState<T> extends State<JustTheInterface>
                       shadow: widget.shadow ?? defaultShadow,
                       elevation: widget.elevation,
                       scrollPosition: scrollController.position,
+                      borderColor: widget.borderColor,
+                      borderWidth: widget.borderWidth,
                       child: child!,
                     );
                   },
@@ -784,6 +794,8 @@ abstract class JustTheTooltipState<T> extends State<JustTheInterface>
                 shadow: widget.shadow ?? defaultShadow,
                 elevation: widget.elevation,
                 scrollPosition: null,
+                borderColor: widget.borderColor,
+                borderWidth: widget.borderWidth,
                 child: wrappedChild,
               );
             },
@@ -809,7 +821,10 @@ abstract class JustTheTooltipState<T> extends State<JustTheInterface>
         height: widget.overlayHeight,
         width: widget.overlayWidth,
         child: CompositedTransformFollower(
-            link: _layerLink, offset: widget.overlayOffset, child: widget.overlayWidget),
+          link: _layerLink,
+          offset: widget.overlayOffset,
+          child: widget.overlayWidget,
+        ),
       ),
     );
   }

@@ -14,6 +14,8 @@ class AnimatedTooltip extends ImplicitlyAnimatedWidget {
     required this.preferredDirection,
     required this.offsetToTarget,
     required this.borderRadius,
+    required this.borderColor,
+    required this.borderWidth,
     required this.tailBaseWidth,
     required this.tailLength,
     required this.tailBuilder,
@@ -43,6 +45,10 @@ class AnimatedTooltip extends ImplicitlyAnimatedWidget {
   final Offset offsetToTarget;
 
   final BorderRadiusGeometry borderRadius;
+
+  final Color? borderColor;
+
+  final double borderWidth;
 
   final double tailBaseWidth;
 
@@ -193,6 +199,8 @@ class _AnimatedTooltipState
       shadow: widget.shadow,
       elevation: _elevation!.evaluate(animation),
       scrollPosition: widget.scrollPosition,
+      borderColor: widget.borderColor,
+      borderWidth: widget.borderWidth,
       child: widget.child,
     );
   }
